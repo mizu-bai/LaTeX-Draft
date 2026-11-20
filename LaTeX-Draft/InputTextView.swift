@@ -100,27 +100,12 @@ struct InputTextView: View {
     @Binding var text: String
 
     @Environment(\.colorScheme) private var colorScheme
-
-    /// Theme loaded once; failures fall back to sane defaults instead of crashing.
-    private let editorTheme: EditorThemeModel = {
-        guard
-            let url = Bundle.main.url(forResource: "editor_theme_default", withExtension: "json"),
-            let data = try? Data(contentsOf: url),
-            let theme = try? JSONDecoder.decode(EditorThemeModel.self, from: data, keyStrategy: .convertFromSnakeCase)
-        else {
-            return EditorThemeModel(
-                themeName: "fallback",
-                fontName: "Menlo-Regular",
-                fontSize: 16,
-                fontColorHex: "#000000",
-                highlightRules: [])
-        }
-        return theme
-    }()
+    /// Live theme from Settings (font size, font, highlight colors).
+    @EnvironmentObject var settings: SettingsModel
 
     /// Font metrics for the line-number column (must match the text view font).
     private var lineHeight: CGFloat {
-        editorTheme.font.lineHeight
+        settings.theme.font.lineHeight
     }
 
     /// Live scroll offset of the inner UITextView, published by the coordinator.
@@ -145,13 +130,14 @@ struct InputTextView: View {
             GeometryReader { geometry in
                 EditorTextView(
                     text: $text,
-                    editorTheme: editorTheme,
+                    editorTheme: settings.theme,
                     colorScheme: colorScheme,
                     onScroll: { contentOffsetY = $0 },
                     onLayout: { viewportHeight = $0 }
                 )
                 .onAppear { viewportHeight = geometry.size.height }
                 .onChange(of: geometry.size.height) { viewportHeight = $0 }
+                .id(settings.theme.themeName + "\(Int(settings.theme.fontSize))")
             }
         }
     }

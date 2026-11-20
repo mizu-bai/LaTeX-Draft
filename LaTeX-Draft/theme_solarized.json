@@ -1,0 +1,53 @@
+{
+  "theme_name": "solarized",
+  "font_name": "Menlo-Regular",
+  "font_size": 17,
+  "font_color_hex": "#586E75",
+  "font_color_hex_dark": "#93A1A1",
+  "highlight_rules": [
+    {
+      "description": "comment",
+      "pattern": "%[^\\n]*",
+      "font_color_hex": "#93A1A1",
+      "font_color_hex_dark": "#586E75",
+      "italic": true
+    },
+    {
+      "description": "begin_end",
+      "pattern": "\\\\(begin|end)\\{[^}]*\\}",
+      "font_color_hex": "#CB4B16",
+      "font_color_hex_dark": "#CB4B16",
+      "bold": true
+    },
+    {
+      "description": "command",
+      "pattern": "\\\\([a-zA-Z]+|\\||\\{|\\}|&|%|_|#|\\$|\\\\)",
+      "font_color_hex": "#6C71C4",
+      "font_color_hex_dark": "#D33682"
+    },
+    {
+      "description": "number",
+      "pattern": "\\d+(\\.\\d+)?",
+      "font_color_hex": "#268BD2",
+      "font_color_hex_dark": "#268BD2"
+    },
+    {
+      "description": "curly_brackets",
+      "pattern": "(?<!\\\\)(\\{|\\})",
+      "font_color_hex": "#859900",
+      "font_color_hex_dark": "#859900"
+    },
+    {
+      "description": "square_brackets",
+      "pattern": "\\[|\\]",
+      "font_color_hex": "#B58900",
+      "font_color_hex_dark": "#B58900"
+    },
+    {
+      "description": "parentheses",
+      "pattern": "\\(|\\)",
+      "font_color_hex": "#2AA198",
+      "font_color_hex_dark": "#2AA198"
+    }
+  ]
+}

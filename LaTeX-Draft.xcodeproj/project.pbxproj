@@ -13,6 +13,8 @@
 		3325D703FBCBB2BDA6E933C9 /* EditorThemeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D4012479B543E51366E6 /* EditorThemeModel.swift */; };
 		63720000A000000000000001 /* LaTeXReferenceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000B000000000000002 /* LaTeXReferenceData.swift */; };
 		63720000A000000000000003 /* EditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000B000000000000004 /* EditorModel.swift */; };
+		63720000E00000000000000B /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000F00000000000000C /* SettingsModel.swift */; };
+		63720000E00000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000F00000000000000E /* SettingsView.swift */; };
 		3325D71AEE8C184A2B8CDEC8 /* MathUILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D223141ABE80B9B85E85 /* MathUILabel.swift */; };
 		3325D8C3605AEC0599019B35 /* LaTeX_DraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325DFF87792735042256075 /* LaTeX_DraftTests.swift */; };
 		3325DBD056D3FA274495E297 /* LaTeX_DraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D2A3D400471EDC4CCDE1 /* LaTeX_DraftApp.swift */; };
@@ -21,6 +23,9 @@
 		3325DEF585255121B00F4A9A /* MathUILabelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D843AA144DAE16F86735 /* MathUILabelModel.swift */; };
 		3325DF608A1D726F2243211C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3325DE87197745C537222BDA /* Preview Assets.xcassets */; };
 		3325DFA16E1FA0F67A11A83D /* editor_theme_default.json in Resources */ = {isa = PBXBuildFile; fileRef = 3325DCB420D61BA8D4DE12F3 /* editor_theme_default.json */; };
+		63720000C000000000000005 /* theme_github.json in Resources */ = {isa = PBXBuildFile; fileRef = 63720000D000000000000006 /* theme_github.json */; };
+		63720000C000000000000007 /* theme_monokai.json in Resources */ = {isa = PBXBuildFile; fileRef = 63720000D000000000000008 /* theme_monokai.json */; };
+		63720000C000000000000009 /* theme_solarized.json in Resources */ = {isa = PBXBuildFile; fileRef = 63720000D00000000000000A /* theme_solarized.json */; };
 		5260EB5BC6229E970896E118 /* Pods_LaTeX_Draft_LaTeX_DraftUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E61FBDBF5E81BC2C4A2BD69 /* Pods_LaTeX_Draft_LaTeX_DraftUITests.framework */; };
 		6372CBD527A2FC7D00D72470 /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6372CBD427A2FC7D00D72470 /* ReferenceView.swift */; };
 		6372CBD727A3039000D72470 /* InputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6372CBD627A3039000D72470 /* InputTextView.swift */; };
@@ -63,8 +68,13 @@
 		3325D843AA144DAE16F86735 /* MathUILabelModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MathUILabelModel.swift; sourceTree = "<group>"; };
 		3325D9168050922DAD33C9DE /* LaTeX-Draft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LaTeX-Draft.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3325DCB420D61BA8D4DE12F3 /* editor_theme_default.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = editor_theme_default.json; sourceTree = "<group>"; };
+		63720000D000000000000006 /* theme_github.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = theme_github.json; sourceTree = "<group>"; };
+		63720000D000000000000008 /* theme_monokai.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = theme_monokai.json; sourceTree = "<group>"; };
+		63720000D00000000000000A /* theme_solarized.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = theme_solarized.json; sourceTree = "<group>"; };
 		63720000B000000000000002 /* LaTeXReferenceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXReferenceData.swift; sourceTree = "<group>"; };
 		63720000B000000000000004 /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
+		63720000F00000000000000C /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
+		63720000F00000000000000E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3325DE22E21C9AF886B0A029 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3325DE87197745C537222BDA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3325DFF87792735042256075 /* LaTeX_DraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeX_DraftTests.swift; sourceTree = "<group>"; };
@@ -158,6 +168,8 @@
 				3325DE22E21C9AF886B0A029 /* ContentView.swift */,
 				63720000B000000000000002 /* LaTeXReferenceData.swift */,
 				63720000B000000000000004 /* EditorModel.swift */,
+				63720000F00000000000000C /* SettingsModel.swift */,
+				63720000F00000000000000E /* SettingsView.swift */,
 				63C1C3CC27664ADB00742F9C /* LaTeX-Draft-Bridging-Header.h */,
 			);
 			path = "LaTeX-Draft";
@@ -194,6 +206,9 @@
 				3325D5C9D0D01D3C80352328 /* EditorView.swift */,
 				6372CBD627A3039000D72470 /* InputTextView.swift */,
 				3325DCB420D61BA8D4DE12F3 /* editor_theme_default.json */,
+				63720000D000000000000006 /* theme_github.json */,
+				63720000D000000000000008 /* theme_monokai.json */,
+				63720000D00000000000000A /* theme_solarized.json */,
 				3325D4012479B543E51366E6 /* EditorThemeModel.swift */,
 			);
 			name = EditorView;
@@ -335,6 +350,9 @@
 				6372CBD927A45A6200D72470 /* Menlo-Regular.ttf in Resources */,
 				3325DF608A1D726F2243211C /* Preview Assets.xcassets in Resources */,
 				3325DFA16E1FA0F67A11A83D /* editor_theme_default.json in Resources */,
+				63720000C000000000000005 /* theme_github.json in Resources */,
+				63720000C000000000000007 /* theme_monokai.json in Resources */,
+				63720000C000000000000009 /* theme_solarized.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -464,6 +482,8 @@
 				3325D703FBCBB2BDA6E933C9 /* EditorThemeModel.swift in Sources */,
 				63720000A000000000000001 /* LaTeXReferenceData.swift in Sources */,
 				63720000A000000000000003 /* EditorModel.swift in Sources */,
+				63720000E00000000000000B /* SettingsModel.swift in Sources */,
+				63720000E00000000000000D /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

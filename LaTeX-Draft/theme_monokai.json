@@ -1,0 +1,53 @@
+{
+  "theme_name": "monokai",
+  "font_name": "Menlo-Regular",
+  "font_size": 17,
+  "font_color_hex": "#2D2A26",
+  "font_color_hex_dark": "#F8F8F2",
+  "highlight_rules": [
+    {
+      "description": "comment",
+      "pattern": "%[^\\n]*",
+      "font_color_hex": "#75715E",
+      "font_color_hex_dark": "#88846F",
+      "italic": true
+    },
+    {
+      "description": "begin_end",
+      "pattern": "\\\\(begin|end)\\{[^}]*\\}",
+      "font_color_hex": "#F92672",
+      "font_color_hex_dark": "#F92672",
+      "bold": true
+    },
+    {
+      "description": "command",
+      "pattern": "\\\\([a-zA-Z]+|\\||\\{|\\}|&|%|_|#|\\$|\\\\)",
+      "font_color_hex": "#9C79FF",
+      "font_color_hex_dark": "#AE81FF"
+    },
+    {
+      "description": "number",
+      "pattern": "\\d+(\\.\\d+)?",
+      "font_color_hex": "#7B5BD6",
+      "font_color_hex_dark": "#AE81FF"
+    },
+    {
+      "description": "curly_brackets",
+      "pattern": "(?<!\\\\)(\\{|\\})",
+      "font_color_hex": "#5E9C00",
+      "font_color_hex_dark": "#A6E22E"
+    },
+    {
+      "description": "square_brackets",
+      "pattern": "\\[|\\]",
+      "font_color_hex": "#C4A000",
+      "font_color_hex_dark": "#E6DB74"
+    },
+    {
+      "description": "parentheses",
+      "pattern": "\\(|\\)",
+      "font_color_hex": "#B8860B",
+      "font_color_hex_dark": "#FD971F"
+    }
+  ]
+}

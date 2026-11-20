@@ -20,6 +20,9 @@ final class EditorModel: ObservableObject {
     /// The LaTeX source being edited.
     @Published var latex: String = ""
 
+    /// Render preview mode (inline vs display), kept across tab switches.
+    @Published var labelMode: MTMathUILabelMode = .display
+
     /// Render-preview configuration (mode, font size, adaptive color).
     /// One stable instance for the whole app session.
     ///

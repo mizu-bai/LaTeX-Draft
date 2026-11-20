@@ -1,0 +1,53 @@
+{
+  "theme_name": "github-dark-light",
+  "font_name": "Menlo-Regular",
+  "font_size": 17,
+  "font_color_hex": "#24292F",
+  "font_color_hex_dark": "#E6EDF3",
+  "highlight_rules": [
+    {
+      "description": "comment",
+      "pattern": "%[^\\n]*",
+      "font_color_hex": "#6E7781",
+      "font_color_hex_dark": "#8B949E",
+      "italic": true
+    },
+    {
+      "description": "begin_end",
+      "pattern": "\\\\(begin|end)\\{[^}]*\\}",
+      "font_color_hex": "#CF222E",
+      "font_color_hex_dark": "#FF7B72",
+      "bold": true
+    },
+    {
+      "description": "command",
+      "pattern": "\\\\([a-zA-Z]+|\\||\\{|\\}|&|%|_|#|\\$|\\\\)",
+      "font_color_hex": "#8250DF",
+      "font_color_hex_dark": "#D2A8FF"
+    },
+    {
+      "description": "number",
+      "pattern": "\\d+(\\.\\d+)?",
+      "font_color_hex": "#0550AE",
+      "font_color_hex_dark": "#79C0FF"
+    },
+    {
+      "description": "curly_brackets",
+      "pattern": "(?<!\\\\)(\\{|\\})",
+      "font_color_hex": "#116329",
+      "font_color_hex_dark": "#7EE787"
+    },
+    {
+      "description": "square_brackets",
+      "pattern": "\\[|\\]",
+      "font_color_hex": "#953800",
+      "font_color_hex_dark": "#FFA657"
+    },
+    {
+      "description": "parentheses",
+      "pattern": "\\(|\\)",
+      "font_color_hex": "#B08800",
+      "font_color_hex_dark": "#E3B341"
+    }
+  ]
+}

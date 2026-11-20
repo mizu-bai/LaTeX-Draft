@@ -9,8 +9,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    /// The single shared state instance for the whole app.
+    /// The single shared state instances for the whole app.
     @StateObject private var editorModel = EditorModel()
+    @StateObject private var settingsModel = SettingsModel()
 
     var body: some View {
         TabView {
@@ -25,10 +26,17 @@ struct ContentView: View {
                     Image(systemName: "tablecells")
                     Text("Reference")
                 }
+
+            SettingsView()
+                .tabItem {
+                    Image(systemName: "gearshape")
+                    Text("Settings")
+                }
         }
         // Sibling tabs share one model: tapping a Reference symbol mutates
         // editorModel.latex, and the Editor tab updates automatically.
         .environmentObject(editorModel)
+        .environmentObject(settingsModel)
     }
 }
 

@@ -10,6 +10,7 @@ struct EditorView: View {
     // Shared state injected by ContentView — survives tab switches and
     // receives symbol insertions from the Reference tab.
     @EnvironmentObject var editorModel: EditorModel
+    @EnvironmentObject var settings: SettingsModel
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -20,13 +21,13 @@ struct EditorView: View {
     var body: some View {
         VStack(spacing: 0) {
             // MARK: Render preview card
-            RenderPreview(latex: $editorModel.latex, labelModel: editorModel.previewModel)
+            RenderPreview(latex: $editorModel.latex, labelMode: $editorModel.labelMode)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
             // MARK: Toolbar: mode switcher + editing actions
             HStack(spacing: 12) {
-                Picker("Mode", selection: $editorModel.previewModel.labelMode) {
+                Picker("Mode", selection: $editorModel.labelMode) {
                     Text("Inline").tag(MTMathUILabelMode.text)
                     Text("Display").tag(MTMathUILabelMode.display)
                 }
@@ -90,15 +91,27 @@ struct EditorView: View {
 /// which otherwise covers SwiftUI siblings by default).
 struct RenderPreview: View {
     @Binding var latex: String
-    @ObservedObject var labelModel: MathUILabelModel
+    @Binding var labelMode: MTMathUILabelMode
+    @EnvironmentObject var settings: SettingsModel
+    @Environment(\.colorScheme) var colorScheme
 
     /// The parse error reported by the preview label, if any.
     @State private var parseError: String?
 
+    /// Preview label model derived from the current settings: editor font
+    /// size + 7 for display prominence, colors from the theme.
+    private func makeLabelModel() -> MathUILabelModel {
+        let model = MathUILabelModel()
+        model.labelMode = labelMode
+        model.fontSize = settings.theme.fontSize + 7
+        model.textColor = settings.theme.baseColor(isDark: colorScheme == .dark)
+        return model
+    }
+
     var body: some View {
         ZStack {
             MathUILabel($latex,
-                        labelModel: labelModel,
+                        labelModel: makeLabelModel(),
                         parseError: $parseError)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
