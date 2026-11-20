@@ -7,7 +7,9 @@ import SwiftUI
 struct EditorView: View {
 
     @State private var latex: String = ""
-    @ObservedObject var mathUILabelModel: MathUILabelModel = MathUILabelModel()
+    // @StateObject: the model's lifetime is owned by this view. (@ObservedObject
+    // would recreate the model every time the view body re-evaluates.)
+    @StateObject var mathUILabelModel = MathUILabelModel()
     @Environment(\.colorScheme) var colorScheme
     var isLight: Bool {
         colorScheme == .light

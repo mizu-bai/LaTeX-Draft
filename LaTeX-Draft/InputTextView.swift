@@ -28,14 +28,14 @@ extension UITextView {
 }
 
 extension String {
-    func setSyntaxHighlight(with editorTheme: EditorThemeModel) -> NSMutableAttributedString {
+    func setSyntaxHighlight(with editorTheme: EditorThemeModel, isDark: Bool) -> NSMutableAttributedString {
 
         let attributedString = NSMutableAttributedString(string: self)
 
         attributedString.setAttributes(
                 [
-                    .font: UIFont(name: editorTheme.fontName, size: editorTheme.fontSize)!,
-                    .foregroundColor: UIColor(editorTheme.fontColorHex),
+                    .font: editorTheme.font,
+                    .foregroundColor: editorTheme.baseColor(isDark: isDark),
                 ],
                 range: NSRange(location: 0, length: count))
 
@@ -46,8 +46,8 @@ extension String {
                 for item in results {
                     attributedString.setAttributes(
                             [
-                                .font: UIFont(name: editorTheme.fontName, size: editorTheme.fontSize)!,
-                                .foregroundColor: UIColor(rule.fontColorHex)
+                                .font: rule.font(for: editorTheme, isDark: isDark),
+                                .foregroundColor: rule.color(isDark: isDark),
                             ],
                             range: item.range)
                 }
@@ -65,16 +65,23 @@ struct InputTextView: UIViewRepresentable {
 
     @Binding var text: String
 
-    let editorTheme = {() -> EditorThemeModel in
-        let url = Bundle.main.url(forResource: "editor_theme_default", withExtension: "json")
-        let modelData = try! Data(contentsOf: url!)
-        let decoder = {() -> JSONDecoder in
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            return decoder
-        }()
-        let model = try! decoder.decode(EditorThemeModel.self, from: modelData)
-        return model
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// Theme loaded once; failures fall back to sane defaults instead of crashing.
+    private let editorTheme: EditorThemeModel = {
+        guard
+            let url = Bundle.main.url(forResource: "editor_theme_default", withExtension: "json"),
+            let data = try? Data(contentsOf: url),
+            let theme = try? JSONDecoder.decode(EditorThemeModel.self, from: data, keyStrategy: .convertFromSnakeCase)
+        else {
+            return EditorThemeModel(
+                themeName: "fallback",
+                fontName: "Menlo-Regular",
+                fontSize: 16,
+                fontColorHex: "#000000",
+                highlightRules: [])
+        }
+        return theme
     }()
 
     init(_ text: Binding<String>) {
@@ -85,7 +92,7 @@ struct InputTextView: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextView {
         let inputTextView = UITextView()
         inputTextView.delegate = context.coordinator
-        inputTextView.font = UIFont(name: "Menlo-Regular", size: 16)
+        inputTextView.font = editorTheme.font
         inputTextView.autocapitalizationType = .none
         inputTextView.autocorrectionType = .no
 
@@ -101,11 +108,24 @@ struct InputTextView: UIViewRepresentable {
     }
 
     func updateUIView(_ textView: UITextView, context: Context) {
-        let loc = textView.selectedRange.location
-        print(loc)
-        textView.attributedText = text.setSyntaxHighlight(with: editorTheme)
-        textView.selectedRange = NSRange(location: loc,length: 0)
-        print(loc)
+        textView.backgroundColor = .clear
+        let isDark = colorScheme == .dark
+
+        // Re-highlight when the text changed since the last applied pass, or
+        // when light/dark appearance flipped. Comparing against the coordinator's
+        // last-applied state (not textView.text) is the key: after typing, the
+        // text view and the binding are already equal, yet a re-highlight is due.
+        let coordinator = context.coordinator
+        let needsUpdate = (coordinator.appliedText != text)
+            || (coordinator.appliedIsDark != isDark)
+        guard needsUpdate else { return }
+
+        let selectedRange = textView.selectedRange
+        textView.attributedText = text.setSyntaxHighlight(with: editorTheme, isDark: isDark)
+        textView.selectedRange = selectedRange
+
+        coordinator.appliedText = text
+        coordinator.appliedIsDark = isDark
     }
 
     func makeCoordinator() -> Coordinator {
@@ -116,6 +136,9 @@ struct InputTextView: UIViewRepresentable {
     class Coordinator: NSObject, UITextViewDelegate {
 
         var parent: InputTextView
+        /// Last state applied to the text view, to avoid redundant re-highlighting.
+        var appliedText: String?
+        var appliedIsDark: Bool?
 
         init(_ parent: InputTextView) {
             self.parent = parent
@@ -124,13 +147,16 @@ struct InputTextView: UIViewRepresentable {
         func textViewDidChange(_ textView: UITextView) {
             parent.text = textView.text
         }
+    }
+}
 
-        func textViewDidBeginEditing(_ textView: UITextView) {
+// MARK: - Decoding helper
 
-        }
-
-        func textViewDidEndEditing(_ textView: UITextView) {
-
-        }
+private extension JSONDecoder {
+    /// Decode with a chosen key strategy in one call.
+    static func decode<T: Decodable>(_ type: T.Type, from data: Data, keyStrategy: JSONDecoder.KeyDecodingStrategy) throws -> T {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = keyStrategy
+        return try decoder.decode(type, from: data)
     }
 }

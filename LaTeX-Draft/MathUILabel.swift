@@ -6,14 +6,16 @@ import SwiftUI
 import iosMath
 
 struct MathUILabel: UIViewRepresentable {
-    @Environment(\.colorScheme) var colorScheme
-
     @Binding var latex: String
     private var labelMode: MTMathUILabelMode   = .display
     private var textAlignment: MTTextAlignment = .left
     private var fontSize: CGFloat              = MTFontManager().defaultFont().fontSize
     private var font: MTFont                   = MTFontManager().defaultFont()
     private var textColor: UIColor             = .black
+
+    /// Shared default model. One instance keeps `textColor` (a dynamic-provider
+    /// UIColor) identity-stable across cells, so updateUIView can skip it.
+    static let defaultLabelModel = MathUILabelModel()
 
     private var _labelModel: MathUILabelModel = MathUILabelModel()
     var labelModel: MathUILabelModel {
@@ -31,10 +33,15 @@ struct MathUILabel: UIViewRepresentable {
     }
 
     init(_ latex: Binding<String>,
-         labelModel: MathUILabelModel = MathUILabelModel()
+         labelModel: MathUILabelModel = MathUILabel.defaultLabelModel
          ) {
         self._latex = latex
         self.labelModel = labelModel
+    }
+
+    /// Convenience initializer for static, non-editable LaTeX rendering.
+    init(latex: String, labelModel: MathUILabelModel = MathUILabel.defaultLabelModel) {
+        self.init(.constant(latex), labelModel: labelModel)
     }
 
     func makeUIView(context: Context) -> MTMathUILabel {
@@ -48,26 +55,17 @@ struct MathUILabel: UIViewRepresentable {
         return label
     }
 
+    /// Only touch the UIView when a value actually changed. Assigning `latex`
+    /// re-parses and re-typesets the whole expression, so blindly writing it
+    /// on every SwiftUI update made the reference grid stutter.
+    /// Treat this like UICollectionViewCell reuse: cheap and idempotent.
     func updateUIView(_ uiView: MTMathUILabel, context: Context) {
-        DispatchQueue.main.async {
-            uiView.latex         = latex
-            uiView.labelMode     = labelMode
-            uiView.textAlignment = textAlignment
-            uiView.fontSize      = fontSize
-            uiView.font          = font
-            uiView.textColor     = textColor
-        }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        .init(latex: $latex)
-    }
-
-    class Coordinator: NSObject {
-        @Binding var latex: String
-        init(latex: Binding<String>) {
-            self._latex = latex
-        }
+        if uiView.latex != latex                       { uiView.latex = latex }
+        if uiView.labelMode != labelMode               { uiView.labelMode = labelMode }
+        if uiView.textAlignment != textAlignment       { uiView.textAlignment = textAlignment }
+        if uiView.fontSize != fontSize                 { uiView.fontSize = fontSize }
+        if uiView.font !== font                        { uiView.font = font }
+        if uiView.textColor != textColor               { uiView.textColor = textColor }
     }
 
     func then(_ body: (inout Self) -> Void) -> Self {

@@ -10,5 +10,8 @@ class MathUILabelModel: ObservableObject {
     @Published var textAlignment: MTTextAlignment = .center
     @Published var fontSize: CGFloat              = MTFontManager().defaultFont().fontSize
     @Published var font: MTFont                   = MTFontManager().defaultFont()
-    @Published var textColor: UIColor             = .black
+    /// Dynamic color: adapts to light/dark mode automatically.
+    @Published var textColor: UIColor = UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .light ? .black : .white
+    }
 }
