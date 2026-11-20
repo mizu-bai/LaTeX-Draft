@@ -27,26 +27,60 @@ struct EditorView: View {
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
-            // MARK: Control bar
-            HStack {
-                Text("Display style:")
-                Spacer()
-                Button(mathUILabelModel.labelMode == .display ? "Display" : "Inline") {
-                    if mathUILabelModel.labelMode == .display {
-                        mathUILabelModel.labelMode = .text
-                    } else {
-                        mathUILabelModel.labelMode = .display
-                    }
+            // MARK: Toolbar: mode switcher + editing actions
+            HStack(spacing: 12) {
+                Picker("Mode", selection: $mathUILabelModel.labelMode) {
+                    Text("Inline").tag(MTMathUILabelMode.text)
+                    Text("Display").tag(MTMathUILabelMode.display)
                 }
-                .buttonStyle(.bordered)
+                .pickerStyle(.segmented)
+                .frame(width: 160)
+                .labelsHidden()
+
+                Spacer()
+
+                HStack(spacing: 2) {
+                    IconButton(systemImage: "doc.on.doc",
+                               help: "Copy LaTeX source") {
+                        if !latex.isEmpty {
+                            UIPasteboard.general.string = latex
+                        }
+                    }
+                    .disabled(latex.isEmpty)
+                    IconButton(systemImage: "clipboard",
+                               help: "Paste LaTeX source") {
+                        if let text = UIPasteboard.general.string {
+                            latex = text
+                        }
+                    }
+                    IconButton(systemImage: "trash",
+                               help: "Clear editor") {
+                        latex = ""
+                    }
+                    .disabled(latex.isEmpty)
+                }
             }
             .padding(.horizontal)
-            .padding(.vertical, 8)
+            .padding(.top, 6)
+            // Breathing room between the toolbar and the input card below.
+            .padding(.bottom, 14)
 
             // MARK: Input card
             InputTextView($latex)
-                .padding()
+                .padding(8)
                 .frame(minHeight: 140, alignment: .topLeading)
+                // Outlined card so the editable region reads as a text field:
+                // subtle fill + a visible border in both appearances.
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.primary.opacity(0.06))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.primary.opacity(0.35), lineWidth: 1)
+                )
+                .padding(.horizontal)
+                .padding(.bottom)
         }
     }
 }
@@ -85,6 +119,34 @@ struct RenderPreview: View {
                 .padding(.top, 4)
             }
         }
+    }
+}
+
+// MARK: - Icon Button
+
+/// A small square icon button for the editor toolbar, with a hover tooltip.
+struct IconButton: View {
+    let systemImage: String
+    let help: String
+    let action: () -> Void
+
+    @State private var isHovered = false
+    @Environment(\.colorScheme) var colorScheme
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(isHovered ? .primary : .secondary)
+                .frame(width: 30, height: 26)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.primary.opacity(isHovered ? 0.08 : 0))
+                )
+        }
+        .buttonStyle(.plain)
+        .help(help)
+        .onHover { isHovered = $0 }
     }
 }
 

@@ -10,6 +10,76 @@ import UIKit
 import Combine
 import UIColor_Hex_Swift
 
+// MARK: - Line Number Ruler
+
+/// A thin ruler view that draws line numbers aligned with the text view's
+/// visible lines. Attached as a subview; scrolls with the text via offset.
+class LineNumberRulerView: UIView {
+
+    weak var textView: UITextView?
+
+    private let gutterWidth: CGFloat = 34
+
+    override var intrinsicContentSize: CGSize {
+        CGSize(width: gutterWidth, height: bounds.height)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        frame.origin.x = textView?.contentOffset.x ?? 0
+        setNeedsDisplay()
+    }
+
+    override func draw(_ rect: CGRect) {
+        guard let textView = textView,
+              let attributedText = textView.attributedText,
+              attributedText.length > 0 || !textView.text.isEmpty else {
+            return
+        }
+
+        let layout = textView.layoutManager
+        let font = textView.font ?? .systemFont(ofSize: 16)
+        let text = textView.text as NSString
+
+        // Draw a number for every visible line fragment.
+        let visibleGlyphRange = layout.glyphRange(forBoundingRect: textView.bounds, in: textView.textContainer)
+        var lineNumber = 1
+
+        // Count lines before the visible range to get the first visible line number.
+        let visibleStart = visibleGlyphRange.location
+        if visibleStart > 0 {
+            let before = text.substring(to: min(visibleStart, text.length))
+            lineNumber = before.components(separatedBy: "\n").count
+        }
+
+        var charIndex = visibleStart
+        let charEnd = visibleStart + visibleGlyphRange.length
+
+        UIColor.secondaryLabel.setFill()
+
+        while charIndex < charEnd {
+            let lineRange = text.lineRange(for: NSRange(location: charIndex, length: 0))
+            let glyphRange = layout.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
+            guard glyphRange.length > 0 else { break }
+
+            let fragmentRect = layout.lineFragmentRect(forGlyphAt: glyphRange.location, effectiveRange: nil)
+            let y = fragmentRect.minY - textView.contentOffset.y
+
+            let number = "\(lineNumber)" as NSString
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: UIColor.secondaryLabel,
+            ]
+            let size = number.size(withAttributes: attributes)
+            number.draw(at: CGPoint(x: (bounds.width - size.width) - 6, y: y + (fragmentRect.height - size.height) / 2),
+                        withAttributes: attributes)
+
+            lineNumber += 1
+            charIndex = NSMaxRange(lineRange)
+        }
+    }
+}
+
 extension UITextView {
     // MARK: - Add Tool Bar
     func toolBar(_ barItems: [UIBarButtonItem]) {
@@ -96,6 +166,14 @@ struct InputTextView: UIViewRepresentable {
         inputTextView.autocapitalizationType = .none
         inputTextView.autocorrectionType = .no
 
+        // Line-number gutter down the left edge.
+        let ruler = LineNumberRulerView(frame: CGRect(x: 0, y: 0, width: 34, height: 0))
+        ruler.textView = inputTextView
+        inputTextView.addSubview(ruler)
+        inputTextView.textContainerInset = UIEdgeInsets(top: 8, left: 38, bottom: 8, right: 8)
+        context.coordinator.ruler = ruler
+        context.coordinator.textView = inputTextView
+
         inputTextView.toolBar([
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(
@@ -126,6 +204,8 @@ struct InputTextView: UIViewRepresentable {
 
         coordinator.appliedText = text
         coordinator.appliedIsDark = isDark
+
+        coordinator.ruler?.setNeedsDisplay()
     }
 
     func makeCoordinator() -> Coordinator {
@@ -139,6 +219,8 @@ struct InputTextView: UIViewRepresentable {
         /// Last state applied to the text view, to avoid redundant re-highlighting.
         var appliedText: String?
         var appliedIsDark: Bool?
+        var ruler: LineNumberRulerView?
+        weak var textView: UITextView?
 
         init(_ parent: InputTextView) {
             self.parent = parent
@@ -146,6 +228,12 @@ struct InputTextView: UIViewRepresentable {
 
         func textViewDidChange(_ textView: UITextView) {
             parent.text = textView.text
+            ruler?.setNeedsDisplay()
+        }
+
+        /// Keep the gutter in sync while scrolling.
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            ruler?.setNeedsDisplay()
         }
     }
 }
