@@ -12,28 +12,58 @@ import iosMath
 // MARK: - Symbol Cell
 
 /// One grid cell: the symbol rendered live by iosMath, plus its LaTeX command.
-/// Tapping the cell copies the command to the clipboard.
+/// Tapping the cell inserts the command into the editor (via the shared
+/// EditorModel); the cell shows a hint so the behavior is discoverable.
 struct SymbolCellView: View {
     let symbol: LaTeXSymbol
-    /// Called when the cell is tapped; parent shows the "Copied" feedback.
-    let onCopy: (String) -> Void
+    /// Called when the cell is tapped; parent shows the "Inserted" feedback.
+    let onInsert: (String) -> Void
+
+    @State private var isHovered = false
 
     var body: some View {
         VStack(spacing: 6) {
             MathUILabel(latex: symbol.renderAs)
-                .frame(minHeight: 32)
+                .frame(minHeight: 36)
                 .frame(maxWidth: .infinity)
             Text(symbol.latex)
-                .font(.system(size: 10, design: .monospaced))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundColor(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.primary.opacity(isHovered ? 0.09 : 0.04))
+        )
+        .overlay(alignment: .topTrailing) {
+            // Subtle affordance: a little plus badge on hover.
+            if isHovered {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(.accentColor)
+                    .padding(4)
+                    .transition(.opacity)
+            }
+        }
         .contentShape(Rectangle()) // make the whole cell tappable, not just the text
         .onTapGesture {
-            onCopy(symbol.latex)
+            onInsert(symbol.latex)
+        }
+        .onHover { isHovered = $0 }
+        .help("Insert \(symbol.latex) into the editor")
+        .animation(.easeOut(duration: 0.15), value: isHovered)
+        // Mac-native escape hatch: right-click (Ctrl-click) to copy instead of
+        // inserting — for taking the command to another app.
+        .contextMenu {
+            Button("Copy \(symbol.latex)") {
+                UIPasteboard.general.string = symbol.latex
+            }
+            Button("Insert into editor") {
+                onInsert(symbol.latex)
+            }
         }
     }
 }
@@ -42,7 +72,7 @@ struct SymbolCellView: View {
 
 struct SymbolSectionView: View {
     let section: LaTeXSymbolSection
-    let onCopy: (String) -> Void
+    let onInsert: (String) -> Void
 
     /// Two-column adaptive grid: 200pt is the ideal cell width on iPhone,
     /// more columns appear automatically on wider windows (iPad / Mac).
@@ -51,7 +81,7 @@ struct SymbolSectionView: View {
     var body: some View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
             ForEach(section.symbols) { symbol in
-                SymbolCellView(symbol: symbol, onCopy: onCopy)
+                SymbolCellView(symbol: symbol, onInsert: onInsert)
                     .background(Color.primary.opacity(0.04))
                     .cornerRadius(8)
             }
@@ -65,7 +95,9 @@ struct ReferenceView: View {
     /// Search text from the system `.searchable` bar.
     @State private var searchText = ""
     /// Commands tapped in a cell, for the copy feedback overlay.
-    @State private var copiedCommand: String?
+    /// Shared editor state — inserting a symbol reaches the Editor tab.
+    @EnvironmentObject var editorModel: EditorModel
+    @State private var insertedCommand: String?
 
     /// Sections filtered by search; empty search shows everything.
     private var filteredSections: [LaTeXSymbolSection] {
@@ -85,7 +117,7 @@ struct ReferenceView: View {
                 LazyVStack(alignment: .leading, spacing: 16, pinnedViews: .sectionHeaders) {
                     ForEach(filteredSections) { section in
                         Section {
-                            SymbolSectionView(section: section, onCopy: copy)
+                            SymbolSectionView(section: section, onInsert: insert)
                                 .padding(.horizontal)
                         } header: {
                             Text(section.name)
@@ -114,8 +146,8 @@ struct ReferenceView: View {
                 }
             }
             .overlay(alignment: .bottom) {
-                if let copied = copiedCommand {
-                    Text("Copied \(copied)")
+                if let inserted = insertedCommand {
+                    Text("Inserted \(inserted)")
                         .font(.footnote.weight(.medium))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
@@ -124,19 +156,19 @@ struct ReferenceView: View {
                         .task {
                             // New concurrency: Task { } replaces DispatchQueue.main.asyncAfter.
                             try? await Task.sleep(for: .seconds(1.2))
-                            withAnimation { copiedCommand = nil }
+                            withAnimation { insertedCommand = nil }
                         }
                 }
             }
-            .animation(.easeOut(duration: 0.2), value: copiedCommand)
+            .animation(.easeOut(duration: 0.2), value: insertedCommand)
         }
         .environment(\.sizeCategory, .large)
     }
 
-    // Copy feedback helper used by cells (kept simple for now).
-    private func copy(_ command: String) {
-        UIPasteboard.general.string = command
-        withAnimation { copiedCommand = command }
+    /// Insert a symbol command into the shared editor and show feedback.
+    private func insert(_ command: String) {
+        editorModel.insert(command)
+        withAnimation { insertedCommand = command }
     }
 }
 

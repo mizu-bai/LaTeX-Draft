@@ -7,29 +7,26 @@ import iosMath
 
 struct EditorView: View {
 
-    @State private var latex: String = ""
-    // @StateObject: the model's lifetime is owned by this view. (@ObservedObject
-    // would recreate the model every time the view body re-evaluates.)
-    @StateObject var mathUILabelModel = MathUILabelModel()
+    // Shared state injected by ContentView — survives tab switches and
+    // receives symbol insertions from the Reference tab.
+    @EnvironmentObject var editorModel: EditorModel
+
     @Environment(\.colorScheme) var colorScheme
 
     init() {
         UITextView.appearance().backgroundColor = .clear
-        mathUILabelModel.textColor = UIColor { (trainCollection) -> UIColor in
-            trainCollection.userInterfaceStyle == .light ? .black : .white
-        }
     }
 
     var body: some View {
         VStack(spacing: 0) {
             // MARK: Render preview card
-            RenderPreview(latex: $latex, labelModel: mathUILabelModel)
+            RenderPreview(latex: $editorModel.latex, labelModel: editorModel.previewModel)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
             // MARK: Toolbar: mode switcher + editing actions
             HStack(spacing: 12) {
-                Picker("Mode", selection: $mathUILabelModel.labelMode) {
+                Picker("Mode", selection: $editorModel.previewModel.labelMode) {
                     Text("Inline").tag(MTMathUILabelMode.text)
                     Text("Display").tag(MTMathUILabelMode.display)
                 }
@@ -42,22 +39,22 @@ struct EditorView: View {
                 HStack(spacing: 2) {
                     IconButton(systemImage: "doc.on.doc",
                                help: "Copy LaTeX source") {
-                        if !latex.isEmpty {
-                            UIPasteboard.general.string = latex
+                        if !editorModel.latex.isEmpty {
+                            UIPasteboard.general.string = editorModel.latex
                         }
                     }
-                    .disabled(latex.isEmpty)
+                    .disabled(editorModel.latex.isEmpty)
                     IconButton(systemImage: "clipboard",
                                help: "Paste LaTeX source") {
                         if let text = UIPasteboard.general.string {
-                            latex = text
+                            editorModel.latex = text
                         }
                     }
                     IconButton(systemImage: "trash",
                                help: "Clear editor") {
-                        latex = ""
+                        editorModel.latex = ""
                     }
-                    .disabled(latex.isEmpty)
+                    .disabled(editorModel.latex.isEmpty)
                 }
             }
             .padding(.horizontal)
@@ -66,9 +63,9 @@ struct EditorView: View {
             .padding(.bottom, 14)
 
             // MARK: Input card
-            InputTextView($latex)
+            InputTextView($editorModel.latex)
                 .padding(8)
-                .frame(minHeight: 140, alignment: .topLeading)
+                .frame(minHeight: 160, alignment: .topLeading)
                 // Outlined card so the editable region reads as a text field:
                 // subtle fill + a visible border in both appearances.
                 .background(
@@ -87,9 +84,10 @@ struct EditorView: View {
 
 // MARK: - Render Preview
 
-/// The live preview area: rendered formula on a tinted card, or a friendly
-/// hint when the input doesn't parse yet (iosMath's inline red error text
-/// is disabled — its message surfaces in a small capsule instead).
+/// The live preview area: rendered formula, or a friendly hint when the input
+/// doesn't parse yet (iosMath's inline red error text is disabled — its
+/// message surfaces in a capsule; .zIndex keeps it above the UIKit view,
+/// which otherwise covers SwiftUI siblings by default).
 struct RenderPreview: View {
     @Binding var latex: String
     @ObservedObject var labelModel: MathUILabelModel
@@ -99,7 +97,9 @@ struct RenderPreview: View {
 
     var body: some View {
         ZStack {
-            MathUILabel($latex, labelModel: labelModel, parseError: $parseError)
+            MathUILabel($latex,
+                        labelModel: labelModel,
+                        parseError: $parseError)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
             if let message = parseError, !latex.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -109,14 +109,16 @@ struct RenderPreview: View {
                         Text(message)
                             .lineLimit(2)
                     }
-                    .font(.callout)
-                    .foregroundColor(.secondary)
+                    .font(.callout.weight(.medium))
+                    .foregroundColor(.primary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(.thinMaterial, in: Capsule())
+                    .shadow(color: .black.opacity(0.15), radius: 4, y: 1)
                     Spacer()
                 }
                 .padding(.top, 4)
+                .zIndex(1) // above the UIViewRepresentable
             }
         }
     }
@@ -131,7 +133,6 @@ struct IconButton: View {
     let action: () -> Void
 
     @State private var isHovered = false
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         Button(action: action) {
@@ -153,5 +154,6 @@ struct IconButton: View {
 struct EditorView_Previews: PreviewProvider {
     static var previews: some View {
         EditorView()
+            .environmentObject(EditorModel())
     }
 }

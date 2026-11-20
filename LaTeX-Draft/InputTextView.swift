@@ -62,12 +62,12 @@ extension String {
 
 // MARK: - Line Numbers
 
-/// A SwiftUI column of line numbers. Line height matches the editor font, and
-/// the numbers scroll with the text via a shared scroll offset binding.
+/// A SwiftUI canvas that paints line numbers directly — no per-line views,
+/// so scrolling and typing stay O(visible lines) instead of O(total lines).
 struct LineNumbersView: View {
     /// Total number of lines in the editor text.
     let lineCount: Int
-    /// Vertical offset of the text inside the text view's content (scroll sync).
+    /// Vertical offset of the text view's content (scroll sync).
     let contentOffsetY: CGFloat
     /// Line height of the editor font — must match the UITextView font exactly.
     let lineHeight: CGFloat
@@ -77,24 +77,21 @@ struct LineNumbersView: View {
     let viewportHeight: CGFloat
 
     var body: some View {
-        // All visible line indexes: from the first line scrolled into view
-        // (possibly negative Y) to the last one within the viewport.
-        GeometryReader { geometry in
-            let firstVisible = Int(max(0, (-contentOffsetY) / lineHeight))
-            let visibleCount = Int((viewportHeight + contentOffsetY) / lineHeight) + 2
+        Canvas { context, size in
+            // First visible line (may be scrolled past the top).
+            let firstVisible = max(0, Int(floor(-contentOffsetY / lineHeight)))
+            // Last line still (partially) inside the viewport.
+            let lastVisible = min(lineCount - 1,
+                                  Int(floor((viewportHeight - topInset - contentOffsetY) / lineHeight)))
 
-            VStack(alignment: .trailing, spacing: 0) {
-                ForEach(0..<max(0, lineCount), id: \.self) { index in
-                    Text("\(index + 1)")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundColor(.secondary.opacity(0.7))
-                        .frame(height: lineHeight, alignment: .center)
-                        .opacity(index >= firstVisible && index < firstVisible + visibleCount ? 1 : 0)
-                }
+            let font = Font.system(size: 12, design: .monospaced)
+
+            for line in firstVisible...max(firstVisible, lastVisible) {
+                let y = topInset + CGFloat(line) * lineHeight + contentOffsetY
+                // Numbers right-aligned in the gutter with a small margin.
+                let text = Text("\(line + 1)").font(font).foregroundColor(.secondary.opacity(0.7))
+                context.draw(text, at: CGPoint(x: size.width - 8, y: y + lineHeight / 2), anchor: .trailing)
             }
-            .offset(y: topInset + contentOffsetY)
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-            .clipped()
         }
     }
 }
@@ -234,7 +231,41 @@ struct EditorTextView: UIViewRepresentable {
         }
 
         func textViewDidChange(_ textView: UITextView) {
+            Self.autocompleteIfNeeded(in: textView)
             parent.text.wrappedValue = textView.text
+        }
+
+        /// When the user finishes typing `\begin{env}`, append a matching
+        /// `\end{env}` and leave the cursor on the empty line in between.
+        /// Only fires right after the closing brace of \begin — typing it
+        /// again (or editing elsewhere) does nothing.
+        private static func autocompleteIfNeeded(in textView: UITextView) {
+            let source = textView.text as NSString
+            let cursor = textView.selectedRange.location
+            guard cursor > 0, cursor <= source.length,
+                  source.substring(with: NSRange(location: cursor - 1, length: 1)) == "}" else {
+                return
+            }
+
+            let head = source.substring(to: cursor)
+
+            // The just-typed "}" must close a \begin{...} right at the cursor.
+            guard head.hasSuffix("\\begin{") == false, // sanity: name not empty below
+                  let openBrace = head.range(of: "\\begin{", options: .backwards),
+                  openBrace.upperBound < head.endIndex else {
+                return
+            }
+            // Name spans from after "\begin{" up to (excluding) the final "}".
+            let nameStart = openBrace.upperBound
+            let nameEnd = head.index(before: head.endIndex)
+            guard nameStart < nameEnd else { return }
+            let environment = String(head[nameStart..<nameEnd])
+            guard !environment.isEmpty, !environment.contains(" "), !environment.contains("}") else { return }
+
+            let insertion = "\n\t\n\\end{\(environment)}"
+            textView.insertText(insertion)
+            // Park the caret on the middle line: cursor + "\n\t".
+            textView.selectedRange = NSRange(location: cursor + 2, length: 0)
         }
 
         /// Keep the line-number column in sync while scrolling.

@@ -6,7 +6,10 @@ import UIKit
 
 /// A renderable LaTeX symbol entry for the Quick Reference.
 struct LaTeXSymbol: Identifiable, Hashable {
-    let id = UUID()
+    /// Stable identity: the command itself is unique across the reference.
+    /// (A fresh UUID per struct would make every rebuild look "all changed"
+    /// to SwiftUI's diffing and force full grid rebuilds while searching.)
+    var id: String { latex }
     /// The LaTeX command, e.g. `\alpha` — shown in the cell and copied on tap.
     let latex: String
     /// What iosMath actually renders. Defaults to `latex`; symbols that iosMath
@@ -25,7 +28,7 @@ struct LaTeXSymbol: Identifiable, Hashable {
 
 /// A category of symbols, mirroring the classic LaTeX reference layout.
 struct LaTeXSymbolSection: Identifiable, Hashable {
-    let id = UUID()
+    var id: String { name }
     let name: String
     let symbols: [LaTeXSymbol]
 }

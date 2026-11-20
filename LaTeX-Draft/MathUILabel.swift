@@ -14,8 +14,8 @@ struct MathUILabel: UIViewRepresentable {
     var parseError: Binding<String?>?
     private var labelMode: MTMathUILabelMode   = .display
     private var textAlignment: MTTextAlignment = .left
-    private var fontSize: CGFloat              = MTFontManager().defaultFont().fontSize
-    private var font: MTFont                   = MTFontManager().defaultFont()
+    private var fontSize: CGFloat              = MathUILabel.cachedDefaultFont.fontSize
+    private var font: MTFont                   = MathUILabel.cachedDefaultFont
     private var textColor: UIColor             = .black
 
     /// Shared default model. One instance keeps `textColor` (a dynamic-provider
@@ -36,6 +36,10 @@ struct MathUILabel: UIViewRepresentable {
             _labelModel
         }
     }
+
+    /// Default font cached once: MTFontManager() does dictionary lookups and
+    /// font loading per call, which is wasteful when the grid creates many cells.
+    private static let cachedDefaultFont = MTFontManager().defaultFont()
 
     init(_ latex: Binding<String>,
          labelModel: MathUILabelModel = MathUILabel.defaultLabelModel,

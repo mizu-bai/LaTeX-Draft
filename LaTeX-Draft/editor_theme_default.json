@@ -1,7 +1,7 @@
 {
   "theme_name": "github-dark-light",
   "font_name": "Menlo-Regular",
-  "font_size": 16,
+  "font_size": 17,
   "font_color_hex": "#24292F",
   "font_color_hex_dark": "#E6EDF3",
   "highlight_rules": [

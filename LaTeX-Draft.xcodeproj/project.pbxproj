@@ -12,6 +12,7 @@
 		3325D559F49EF3721508649F /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D5C9D0D01D3C80352328 /* EditorView.swift */; };
 		3325D703FBCBB2BDA6E933C9 /* EditorThemeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D4012479B543E51366E6 /* EditorThemeModel.swift */; };
 		63720000A000000000000001 /* LaTeXReferenceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000B000000000000002 /* LaTeXReferenceData.swift */; };
+		63720000A000000000000003 /* EditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000B000000000000004 /* EditorModel.swift */; };
 		3325D71AEE8C184A2B8CDEC8 /* MathUILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D223141ABE80B9B85E85 /* MathUILabel.swift */; };
 		3325D8C3605AEC0599019B35 /* LaTeX_DraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325DFF87792735042256075 /* LaTeX_DraftTests.swift */; };
 		3325DBD056D3FA274495E297 /* LaTeX_DraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D2A3D400471EDC4CCDE1 /* LaTeX_DraftApp.swift */; };
@@ -63,6 +64,7 @@
 		3325D9168050922DAD33C9DE /* LaTeX-Draft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LaTeX-Draft.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3325DCB420D61BA8D4DE12F3 /* editor_theme_default.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = editor_theme_default.json; sourceTree = "<group>"; };
 		63720000B000000000000002 /* LaTeXReferenceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXReferenceData.swift; sourceTree = "<group>"; };
+		63720000B000000000000004 /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
 		3325DE22E21C9AF886B0A029 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3325DE87197745C537222BDA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3325DFF87792735042256075 /* LaTeX_DraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeX_DraftTests.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				3325D2A3D400471EDC4CCDE1 /* LaTeX_DraftApp.swift */,
 				3325DE22E21C9AF886B0A029 /* ContentView.swift */,
 				63720000B000000000000002 /* LaTeXReferenceData.swift */,
+				63720000B000000000000004 /* EditorModel.swift */,
 				63C1C3CC27664ADB00742F9C /* LaTeX-Draft-Bridging-Header.h */,
 			);
 			path = "LaTeX-Draft";
@@ -460,6 +463,7 @@
 				3325D559F49EF3721508649F /* EditorView.swift in Sources */,
 				3325D703FBCBB2BDA6E933C9 /* EditorThemeModel.swift in Sources */,
 				63720000A000000000000001 /* LaTeXReferenceData.swift in Sources */,
+				63720000A000000000000003 /* EditorModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
