@@ -50,7 +50,7 @@ struct SettingsView: View {
             .padding(.horizontal)
 
             // MARK: Font size stepper
-            SettingsRow(label: "Font size", controlWidth: controlWidth) {
+            SettingsRow(label: "Font Size", controlWidth: controlWidth) {
                 HStack(spacing: 10) {
                     Button {
                         settings.decrementFontSize()
@@ -75,7 +75,7 @@ struct SettingsView: View {
             }
 
             // MARK: Font picker
-            SettingsRow(label: "Font", controlWidth: controlWidth) {
+            SettingsRow(label: "Font Name", controlWidth: controlWidth) {
                 Picker("Font", selection: $settings.fontName) {
                     ForEach(EditorFontChoice.allCases.sorted(by: { $0.displayName < $1.displayName })) { choice in
                         Text(choice.displayName).tag(choice.rawValue)
@@ -86,7 +86,7 @@ struct SettingsView: View {
             }
 
             // MARK: Theme picker
-            SettingsRow(label: "Highlight theme", controlWidth: controlWidth) {
+            SettingsRow(label: "Highlight Theme", controlWidth: controlWidth) {
                 Picker("Theme", selection: $settings.themeName) {
                     ForEach(EditorThemeName.allCases.sorted(by: { $0.rawValue < $1.rawValue })) { theme in
                         Text(theme.rawValue).tag(theme)
