@@ -6,7 +6,12 @@ import SwiftUI
 import iosMath
 
 struct MathUILabel: UIViewRepresentable {
+    @Environment(\.colorScheme) var colorScheme
+
     @Binding var latex: String
+    /// Optional binding that receives the parse error of the underlying
+    /// MTMathUILabel after each update (nil when the input parses cleanly).
+    var parseError: Binding<String?>?
     private var labelMode: MTMathUILabelMode   = .display
     private var textAlignment: MTTextAlignment = .left
     private var fontSize: CGFloat              = MTFontManager().defaultFont().fontSize
@@ -33,9 +38,11 @@ struct MathUILabel: UIViewRepresentable {
     }
 
     init(_ latex: Binding<String>,
-         labelModel: MathUILabelModel = MathUILabel.defaultLabelModel
+         labelModel: MathUILabelModel = MathUILabel.defaultLabelModel,
+         parseError: Binding<String?>? = nil
          ) {
         self._latex = latex
+        self.parseError = parseError
         self.labelModel = labelModel
     }
 
@@ -52,6 +59,8 @@ struct MathUILabel: UIViewRepresentable {
         label.fontSize      = fontSize
         label.font          = font
         label.textColor     = textColor
+        // Parse errors are surfaced by our own overlay, not red inline text.
+        label.displayErrorInline = false
         return label
     }
 
@@ -66,6 +75,14 @@ struct MathUILabel: UIViewRepresentable {
         if uiView.fontSize != fontSize                 { uiView.fontSize = fontSize }
         if uiView.font !== font                        { uiView.font = font }
         if uiView.textColor != textColor               { uiView.textColor = textColor }
+
+        // Report parse errors to SwiftUI (if a binding was provided).
+        if let parseError = parseError {
+            let message = uiView.error?.localizedDescription
+            if parseError.wrappedValue != message {
+                parseError.wrappedValue = message
+            }
+        }
     }
 
     func then(_ body: (inout Self) -> Void) -> Self {

@@ -223,5 +223,17 @@ enum LaTeXReference {
             LaTeXSymbol("\\mathrm{x}", note: "roman"),
             LaTeXSymbol("\\mathfrak{g}", note: "fraktur"),
         ]),
+        LaTeXSymbolSection(name: "Environments", symbols: [
+            // Only environments iosMath actually supports (verified by test).
+            LaTeXSymbol("\\begin{aligned}a&=b \\\\ c&=d\\end{aligned}", note: "aligned (2 col)"),
+            LaTeXSymbol("\\begin{gather}x \\\\ y\\end{gather}", note: "gather (centered)"),
+            LaTeXSymbol("\\begin{split}a&=b \\\\ c&=d\\end{split}", note: "split"),
+            LaTeXSymbol("\\begin{eqnarray}a&=&b\\end{eqnarray}", note: "eqnarray (3 col)"),
+            LaTeXSymbol("\\begin{cases}a & b\\\\ c & d\\end{cases}", note: "cases"),
+            LaTeXSymbol("\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", note: "paren matrix"),
+            LaTeXSymbol("\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}", note: "bracket matrix"),
+            LaTeXSymbol("\\begin{vmatrix}1&2\\\\3&4\\end{vmatrix}", note: "bar matrix (det)"),
+            LaTeXSymbol("\\begin{matrix}1&2\\\\3&4\\end{matrix}", note: "plain matrix"),
+        ]),
     ]
 }
