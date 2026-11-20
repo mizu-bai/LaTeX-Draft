@@ -14,8 +14,9 @@ struct SettingsView: View {
     @EnvironmentObject var settings: SettingsModel
     @Environment(\.colorScheme) var colorScheme
 
-    /// Shared control-column width: every row's control aligns to the same
-    /// right edge, and pickers never change width with their content.
+    /// Two shared columns: labels center on one vertical line, controls on
+    /// another — both columns have fixed widths so nothing shifts on resize.
+    private let labelWidth: CGFloat = 150
     private let controlWidth: CGFloat = 220
 
     var body: some View {
@@ -50,7 +51,7 @@ struct SettingsView: View {
             .padding(.horizontal)
 
             // MARK: Font size stepper
-            SettingsRow(label: "Font Size", controlWidth: controlWidth) {
+            SettingsRow(label: "Font Size", labelWidth: labelWidth, controlWidth: controlWidth) {
                 HStack(spacing: 14) {
                     Button {
                         settings.decrementFontSize()
@@ -88,7 +89,7 @@ struct SettingsView: View {
             }
 
             // MARK: Font picker
-            SettingsRow(label: "Font Name", controlWidth: controlWidth) {
+            SettingsRow(label: "Font Name", labelWidth: labelWidth, controlWidth: controlWidth) {
                 Picker("Font", selection: $settings.fontName) {
                     ForEach(EditorFontChoice.allCases.sorted(by: { $0.displayName < $1.displayName })) { choice in
                         Text(choice.displayName).tag(choice.rawValue)
@@ -99,7 +100,7 @@ struct SettingsView: View {
             }
 
             // MARK: Theme picker
-            SettingsRow(label: "Highlight Theme", controlWidth: controlWidth) {
+            SettingsRow(label: "Highlight Theme", labelWidth: labelWidth, controlWidth: controlWidth) {
                 Picker("Theme", selection: $settings.themeName) {
                     ForEach(EditorThemeName.allCases.sorted(by: { $0.rawValue < $1.rawValue })) { theme in
                         Text(theme.rawValue).tag(theme)
@@ -124,12 +125,14 @@ struct SettingsView: View {
 /// edge (fixed width), so all rows line up like a native form.
 private struct SettingsRow<Control: View>: View {
     let label: String
+    let labelWidth: CGFloat
     let controlWidth: CGFloat
     @ViewBuilder let control: Control
 
     var body: some View {
         HStack(alignment: .center) {
             Text(label)
+                .frame(width: labelWidth, alignment: .center)
             Spacer()
             control
                 .frame(width: controlWidth, alignment: .center)
