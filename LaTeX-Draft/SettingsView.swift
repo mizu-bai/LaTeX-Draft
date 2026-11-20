@@ -51,25 +51,38 @@ struct SettingsView: View {
 
             // MARK: Font size stepper
             SettingsRow(label: "Font Size", controlWidth: controlWidth) {
-                HStack(spacing: 10) {
+                HStack(spacing: 14) {
                     Button {
                         settings.decrementFontSize()
                     } label: {
                         Image(systemName: "minus")
+                            .font(.system(size: 15, weight: .medium))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill(Color.primary.opacity(0.07))
+                            )
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
                     .disabled(settings.fontSize <= SettingsModel.fontSizeRange.lowerBound)
 
                     Text("\(Int(settings.fontSize))")
                         .monospacedDigit()
+                        .font(.system(size: 15))
                         .frame(minWidth: 36)
 
                     Button {
                         settings.incrementFontSize()
                     } label: {
                         Image(systemName: "plus")
+                            .font(.system(size: 15, weight: .medium))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill(Color.primary.opacity(0.07))
+                            )
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
                     .disabled(settings.fontSize >= SettingsModel.fontSizeRange.upperBound)
                 }
             }
@@ -119,7 +132,7 @@ private struct SettingsRow<Control: View>: View {
             Text(label)
             Spacer()
             control
-                .frame(width: controlWidth, alignment: .trailing)
+                .frame(width: controlWidth, alignment: .center)
         }
         .padding(.horizontal)
     }
