@@ -19,7 +19,8 @@ struct SettingsView: View {
     private let controlWidth: CGFloat = 220
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
             // MARK: Live previews
             Group {
                 Text("Preview")
@@ -28,8 +29,8 @@ struct SettingsView: View {
                 // Rendered formula: follows the font size only.
                 PreviewLabel(latex: "\\left[-\\frac{1}{2}\\nabla^2 - \\frac{1}{r}\\right]\\psi(\\mathbf{r}) = E\\psi(\\mathbf{r})",
                              fontSize: settings.fontSize)
-                    .frame(minHeight: 130)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(height: 150)
+                    .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
                             .fill(Color.primary.opacity(0.05))
@@ -39,7 +40,7 @@ struct SettingsView: View {
                 HighlightPreview(text: "% comment \\begin{cases} x = 42 \\end{cases}\n\\alpha + \\beta_{\\gamma} = \\sqrt[3]{2}",
                                  theme: settings.theme,
                                  isDark: colorScheme == .dark)
-                    .frame(minHeight: 100)
+                    .frame(height: 110)
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -76,7 +77,7 @@ struct SettingsView: View {
             // MARK: Font picker
             SettingsRow(label: "Font", controlWidth: controlWidth) {
                 Picker("Font", selection: $settings.fontName) {
-                    ForEach(EditorFontChoice.allCases) { choice in
+                    ForEach(EditorFontChoice.allCases.sorted(by: { $0.displayName < $1.displayName })) { choice in
                         Text(choice.displayName).tag(choice.rawValue)
                     }
                 }
@@ -87,15 +88,14 @@ struct SettingsView: View {
             // MARK: Theme picker
             SettingsRow(label: "Highlight theme", controlWidth: controlWidth) {
                 Picker("Theme", selection: $settings.themeName) {
-                    ForEach(EditorThemeName.allCases) { theme in
+                    ForEach(EditorThemeName.allCases.sorted(by: { $0.rawValue < $1.rawValue })) { theme in
                         Text(theme.rawValue).tag(theme)
                     }
                 }
                 .pickerStyle(.menu)
                 .frame(width: controlWidth)
             }
-
-            Spacer(minLength: 0)
+            }
         }
         .padding(.vertical)
         // Any settings change re-loads the theme (colors, rules, font).
@@ -117,7 +117,6 @@ private struct SettingsRow<Control: View>: View {
     var body: some View {
         HStack(alignment: .center) {
             Text(label)
-                .frame(maxHeight: .infinity, alignment: .center)
             Spacer()
             control
                 .frame(width: controlWidth, alignment: .trailing)
