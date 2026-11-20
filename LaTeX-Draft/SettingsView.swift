@@ -16,13 +16,26 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // MARK: Live preview
+            // MARK: Live previews
             Group {
                 Text("Preview")
                     .font(.headline)
+
+                // Rendered formula: follows the font size only.
                 PreviewLabel(latex: "\\int_0^\\infty e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}",
-                             theme: settings.theme)
-                    .frame(height: 90)
+                             fontSize: settings.fontSize)
+                    .frame(height: 80)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.primary.opacity(0.05))
+                    )
+
+                // Highlighted LaTeX source: follows the highlight theme.
+                HighlightPreview(text: "% comment \\begin{cases} x = 42 \\end{cases}\n\\alpha + \\beta_{\\gamma} = \\sqrt[3]{2}",
+                                 theme: settings.theme,
+                                 isDark: colorScheme == .dark)
+                    .frame(height: 72)
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -95,12 +108,12 @@ struct SettingsView: View {
 
 // MARK: - Preview label
 
-/// A small MTMathUILabel wrapper that re-renders when the theme changes.
-/// Only font size and colors come from the theme — MTMathUILabel's `font`
-/// expects an MTFont, and the default manager font matches the editor's.
+/// A small MTMathUILabel wrapper that re-renders when the font size changes.
+/// Follows the font size only — the highlight theme colors the LaTeX source,
+/// not the rendered formula.
 private struct PreviewLabel: UIViewRepresentable {
     let latex: String
-    let theme: EditorThemeModel
+    let fontSize: CGFloat
     @Environment(\.colorScheme) private var colorScheme
 
     func makeUIView(context: Context) -> MTMathUILabel {
@@ -112,8 +125,31 @@ private struct PreviewLabel: UIViewRepresentable {
 
     func updateUIView(_ uiView: MTMathUILabel, context: Context) {
         uiView.latex = latex
-        uiView.fontSize = theme.fontSize + 4
-        uiView.textColor = theme.baseColor(isDark: colorScheme == .dark)
+        uiView.fontSize = fontSize + 4
+        uiView.textColor = colorScheme == .dark ? .white : .black
+    }
+}
+
+// MARK: - Highlight preview
+
+/// A non-editable text view showing a sample of LaTeX source highlighted
+/// with the current theme — so the theme picker previews what you actually
+/// get in the editor.
+private struct HighlightPreview: UIViewRepresentable {
+    let text: String
+    let theme: EditorThemeModel
+    let isDark: Bool
+
+    func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
+        view.isEditable = false
+        view.backgroundColor = .clear
+        view.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
+        return view
+    }
+
+    func updateUIView(_ uiView: UITextView, context: Context) {
+        uiView.attributedText = text.setSyntaxHighlight(with: theme, isDark: isDark)
     }
 }
 
