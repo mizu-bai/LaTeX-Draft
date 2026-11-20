@@ -33,7 +33,9 @@ enum EditorFontChoice: String, CaseIterable, Identifiable {
     case menlo = "Menlo-Regular"
     case monaco = "Monaco"
     case courierNew = "CourierNewPSMT"
-    case sfMono = "SFMono-Regular"
+    /// SF Mono is not registered under a public PostScript name; it maps to
+    /// the system monospaced design (UIFont.monospacedSystemFont) instead.
+    case sfMono = "__system_mono__"
 
     var id: String { rawValue }
 
@@ -44,6 +46,15 @@ enum EditorFontChoice: String, CaseIterable, Identifiable {
         case .courierNew: return "Courier New"
         case .sfMono: return "SF Mono"
         }
+    }
+
+    /// Resolve to a concrete UIFont, mapping the system-mono marker.
+    func uiFont(size: CGFloat) -> UIFont {
+        if self == .sfMono {
+            return .monospacedSystemFont(ofSize: size, weight: .regular)
+        }
+        return UIFont(name: rawValue, size: size)
+            ?? .monospacedSystemFont(ofSize: size, weight: .regular)
     }
 }
 
@@ -84,8 +95,8 @@ final class SettingsModel: ObservableObject {
         let initialSize = size == 0 ? 17 : min(max(size, SettingsModel.fontSizeRange.lowerBound),
                                                SettingsModel.fontSizeRange.upperBound)
 
-        let savedFont = defaults.string(forKey: Keys.fontName) ?? EditorFontChoice.menlo.rawValue
-        let initialFont = EditorFontChoice(rawValue: savedFont)?.rawValue ?? EditorFontChoice.menlo.rawValue
+        let savedFont = defaults.string(forKey: Keys.fontName) ?? EditorFontChoice.sfMono.rawValue
+        let initialFont = EditorFontChoice(rawValue: savedFont)?.rawValue ?? EditorFontChoice.sfMono.rawValue
 
         let savedTheme = defaults.string(forKey: Keys.themeName) ?? EditorThemeName.github.rawValue
         let initialTheme = EditorThemeName(rawValue: savedTheme) ?? .github
@@ -127,8 +138,14 @@ final class SettingsModel: ObservableObject {
                 highlightRules: [])
         }
         // Settings win over the JSON defaults.
-        loaded.fontName = fontName
         loaded.fontSize = fontSize
+        if fontName == EditorFontChoice.sfMono.rawValue {
+            // Not a registrable PostScript name; mark the theme so the editor
+            // falls back to the system monospaced font.
+            loaded.fontName = "__system_mono__"
+        } else {
+            loaded.fontName = fontName
+        }
         return loaded
     }
 }

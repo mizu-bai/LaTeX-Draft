@@ -15,8 +15,13 @@ struct EditorThemeModel: Codable {
 
     /// Resolved font; falls back to the system monospaced font if the bundled
     /// font is unavailable, so a bad theme name can never crash the editor.
+    /// The "__system_mono__" marker explicitly selects SF Mono (the system
+    /// monospaced design), which has no registrable PostScript name.
     var font: UIFont {
-        UIFont(name: fontName, size: fontSize) ?? .monospacedSystemFont(ofSize: fontSize, weight: .regular)
+        if fontName == "__system_mono__" {
+            return .monospacedSystemFont(ofSize: fontSize, weight: .regular)
+        }
+        return UIFont(name: fontName, size: fontSize) ?? .monospacedSystemFont(ofSize: fontSize, weight: .regular)
     }
 
     /// Base text color for the given appearance.

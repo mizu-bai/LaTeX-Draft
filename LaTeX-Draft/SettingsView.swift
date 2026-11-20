@@ -26,7 +26,7 @@ struct SettingsView: View {
                     .font(.headline)
 
                 // Rendered formula: follows the font size only.
-                PreviewLabel(latex: "\\int_0^\\infty e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}",
+                PreviewLabel(latex: "\\left[-\\frac{1}{2}\\nabla^2 - \\frac{1}{r}\\right]\\psi(\\mathbf{r}) = E\\psi(\\mathbf{r})",
                              fontSize: settings.fontSize)
                     .frame(minHeight: 130)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -115,8 +115,9 @@ private struct SettingsRow<Control: View>: View {
     @ViewBuilder let control: Control
 
     var body: some View {
-        HStack {
+        HStack(alignment: .center) {
             Text(label)
+                .frame(maxHeight: .infinity, alignment: .center)
             Spacer()
             control
                 .frame(width: controlWidth, alignment: .trailing)
