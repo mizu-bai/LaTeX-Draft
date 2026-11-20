@@ -32,7 +32,9 @@ struct EditorView: View {
                     Text("Display").tag(MTMathUILabelMode.display)
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 160)
+                .font(.body.weight(.medium))
+                .controlSize(.large)
+                .frame(width: 200)
                 .labelsHidden()
 
                 Spacer()
@@ -150,11 +152,11 @@ struct IconButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 16, weight: .medium))
                 .foregroundColor(isHovered ? .primary : .secondary)
-                .frame(width: 30, height: 26)
+                .frame(width: 36, height: 32)
                 .background(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: 7)
                         .fill(Color.primary.opacity(isHovered ? 0.08 : 0))
                 )
         }
