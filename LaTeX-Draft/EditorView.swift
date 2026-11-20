@@ -13,6 +13,8 @@ struct EditorView: View {
     @EnvironmentObject var settings: SettingsModel
 
     @Environment(\.colorScheme) var colorScheme
+    /// Brief feedback after copying the rendered formula as an image.
+    @State private var copiedImage = false
 
     init() {
         UITextView.appearance().backgroundColor = .clear
@@ -40,6 +42,19 @@ struct EditorView: View {
                 Spacer()
 
                 HStack(spacing: 2) {
+                    IconButton(systemImage: "photo.on.rectangle",
+                               help: "Copy rendered formula as image") {
+                        let isDark = colorScheme == .dark
+                        let ok = MathImageRenderer.copyToPasteboard(
+                            latex: editorModel.latex,
+                            fontSize: settings.theme.fontSize + 7,
+                            textColor: isDark ? UIColor.white : UIColor.black,
+                            labelMode: editorModel.labelMode)
+                        if ok {
+                            copiedImage = true
+                        }
+                    }
+                    .disabled(editorModel.latex.isEmpty)
                     IconButton(systemImage: "doc.on.doc",
                                help: "Copy LaTeX source") {
                         if !editorModel.latex.isEmpty {
@@ -82,6 +97,21 @@ struct EditorView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
         }
+        .overlay(alignment: .bottom) {
+            if copiedImage {
+                Text("Formula copied as image")
+                    .font(.footnote.weight(.medium))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(.thinMaterial, in: Capsule())
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .task {
+                        try? await Task.sleep(for: .seconds(1.4))
+                        withAnimation { copiedImage = false }
+                    }
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: copiedImage)
     }
 }
 

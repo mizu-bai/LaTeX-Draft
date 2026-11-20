@@ -15,6 +15,7 @@
 		63720000A000000000000003 /* EditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000B000000000000004 /* EditorModel.swift */; };
 		63720000E00000000000000B /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000F00000000000000C /* SettingsModel.swift */; };
 		63720000E00000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000F00000000000000E /* SettingsView.swift */; };
+		63720000E00000000000000F /* MathImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63720000F000000000000010 /* MathImageRenderer.swift */; };
 		3325D71AEE8C184A2B8CDEC8 /* MathUILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D223141ABE80B9B85E85 /* MathUILabel.swift */; };
 		3325D8C3605AEC0599019B35 /* LaTeX_DraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325DFF87792735042256075 /* LaTeX_DraftTests.swift */; };
 		3325DBD056D3FA274495E297 /* LaTeX_DraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3325D2A3D400471EDC4CCDE1 /* LaTeX_DraftApp.swift */; };
@@ -75,6 +76,7 @@
 		63720000B000000000000004 /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
 		63720000F00000000000000C /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		63720000F00000000000000E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		63720000F000000000000010 /* MathImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathImageRenderer.swift; sourceTree = "<group>"; };
 		3325DE22E21C9AF886B0A029 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3325DE87197745C537222BDA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3325DFF87792735042256075 /* LaTeX_DraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeX_DraftTests.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				63720000B000000000000004 /* EditorModel.swift */,
 				63720000F00000000000000C /* SettingsModel.swift */,
 				63720000F00000000000000E /* SettingsView.swift */,
+				63720000F000000000000010 /* MathImageRenderer.swift */,
 				63C1C3CC27664ADB00742F9C /* LaTeX-Draft-Bridging-Header.h */,
 			);
 			path = "LaTeX-Draft";
@@ -484,6 +487,7 @@
 				63720000A000000000000003 /* EditorModel.swift in Sources */,
 				63720000E00000000000000B /* SettingsModel.swift in Sources */,
 				63720000E00000000000000D /* SettingsView.swift in Sources */,
+				63720000E00000000000000F /* MathImageRenderer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
